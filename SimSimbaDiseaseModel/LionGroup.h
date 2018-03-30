@@ -11,6 +11,12 @@ namespace SimSimba {
 
 	class LionGroup {
 	public:
+		/**
+		Constuctor
+		@param i ID number of the lion group
+		@param l the location of this lion group
+		@param par the simulation parameters
+		*/
 		LionGroup(int i, Territory* l,Param par) {
 			idnum = i;
 			location = l;
@@ -18,6 +24,9 @@ namespace SimSimba {
 		}
 		~LionGroup();
 
+		/*
+		Getters and Setters
+		*/
 		int GetIDNumber() { return idnum; }
 		list<Lion*> GetLions() { return lions; }
 		Territory* GetLocation() { return location; }
