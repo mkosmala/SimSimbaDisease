@@ -1,8 +1,24 @@
+/**
+	Population.cpp
+	The entire population of lions for a single simulation.
+	
+	@author mkosmala
+*/
+
 #include "stdafx.h"
 #include "Population.h"
 
 using namespace SimSimba;
 
+/**
+	Constructor
+	@param fname the population file name containing the starting population
+	@param par the parameters for this simulation
+	@param dostats whether or not to calculate statistics
+	@param fs output statistics file
+	@param fs2 second output statistics file
+	@param wtt whether or not to write to the transcript
+*/
 Population::Population(string fname,Param par,bool dostats,fstream& fs,fstream& fs2,bool wtt) {
 	timestep = 0;
 	nextLionNumber = 0;
@@ -80,9 +96,12 @@ Population::~Population() {
 }
 
 
-
+/**
+	Do one time step of the simulation.
+*/
 void Population::Step() {
 
+	// increment time
 	timestep += TIMESTEP;
 
 	stringstream iss;
@@ -93,7 +112,7 @@ void Population::Step() {
 	WriteToTranscript("\n  Update Ages\n");
 	UpdateAges();
 
-	// harvesting
+	// harvesting (hunting)
 	WriteToTranscript("\n  Harvest Trophies\n");	
 	HarvestTrophies();
 
@@ -108,7 +127,7 @@ void Population::Step() {
 	CalculateSurvival();
 	CalculateDiseaseSurvival();
 
-	// females
+	// female actions
 	WriteToTranscript("\n  Homeless Females Attempt to take Territory\n");
 	HomelessFemalesTakeTerritory();
 	WriteToTranscript("\n  Subadult Females Join their Natal Pride\n");
@@ -118,7 +137,7 @@ void Population::Step() {
 		FemalesDisperseSeparately();
 	KickOutOldGirls();
 
-	// males
+	// male actions
 	WriteToTranscript("\n  Subadult Males Form Coalitions\n");
 	MalesFormCoalitions();
 	WriteToTranscript("\n  Subadult Coalitions become Nomadic\n");
@@ -141,7 +160,11 @@ void Population::Step() {
 	Statistics();
 }
 
-
+/**
+	Get a territory based on its ID number
+	@param id the ID number of a territory
+	@return the territory object
+*/
 Territory* Population::GetTerritory(int id) {
 	Territory* t = NULL;
 	list<Territory*>::iterator iter;
@@ -156,6 +179,11 @@ Territory* Population::GetTerritory(int id) {
 	return t;
 }
 
+/**
+	Get a lion based on its ID number
+	@param id the ID number of a lion
+	@return the lion object
+*/
 Lion* Population::GetLion(int id) {
 	Lion* l = NULL;
 	list<Lion*>::iterator iter;
@@ -170,12 +198,15 @@ Lion* Population::GetLion(int id) {
 	return l;
 }
 
+/**
+	Get a lion group based on its ID number
+	@param id the ID number of the lion group
+	@return the lion group object
+*/
 LionGroup* Population::GetGroup(int id) {
 	LionGroup* g = NULL;
 	list<Pride*>::iterator iter;
 	list<Coalition*>::iterator iter2;
-
-//	if (id==-1) return wanderingFemales;
 
 	for (iter=prides.begin();iter!=prides.end();) {
 		if ((*iter)->GetIDNumber() == id) {
@@ -206,7 +237,10 @@ LionGroup* Population::GetGroup(int id) {
 	return g;
 }
 
-
+/**
+	Create a population of lions (Territories, LionGroups and Lions) based on the description in a file
+	@param fname population file name
+*/
 void Population::Load(string fname) {
 
 	fstream lf;
@@ -406,6 +440,10 @@ void Population::Load(string fname) {
 	nextLionNumber = biglionid+1;
 }
 
+/**
+	Saves the current population to a file
+	@param fname population file name to save to
+*/
 void Population::Save(string fname) {
 
 	// create a new file with some name, get handle to file and open it
@@ -474,7 +512,9 @@ void Population::Save(string fname) {
 	sf.close();
 }
 
-
+/**
+	Garbage collect groups that have been marked for deletion
+*/
 void Population::DeleteMarkedGroups() {
 	LionGroup* group;
 	while (!toDelete.empty()) {
@@ -484,6 +524,9 @@ void Population::DeleteMarkedGroups() {
 	}
 }
 
+/**
+	Produce cubs throughout the population and connect them to their appropriate moms and groups
+*/
 void Population::ProduceCubs() {
 
 	list<Lion*>::iterator iter;
@@ -543,6 +586,10 @@ void Population::ProduceCubs() {
 	}
 }
 
+/**
+	Create a single cub
+	@param mom the mom of the cub
+*/
 void Population::CreateCub(Lion* mom) {
 
 	double r;
@@ -569,6 +616,9 @@ void Population::CreateCub(Lion* mom) {
 	WriteToTranscript(iss.str());
 }
 
+/**
+	Calculate the abandonment of cubs throughout the population 
+*/
 void Population::AbandonCubs() {
 	list<Pride*>::iterator piter;
 	list<Lion*>::iterator liter;
@@ -606,6 +656,10 @@ void Population::AbandonCubs() {
 	}
 }
 
+/**
+	Abandon a single cub
+	@param cub cub to be abandoned
+*/
 void Population::Abandon(Lion* cub) {
 	stringstream iss;
 	iss << "    Cub " << cub->GetIDNumber() << " is abandoned. (Mom=" << cub->GetMom()->GetIDNumber();
@@ -615,6 +669,12 @@ void Population::Abandon(Lion* cub) {
 	Kill(cub,ABANDONED);
 }
 
+/**
+	Kills a lion. Marks it for deletion and calculates the ramifications of the death
+	@param lion the lion to be killed
+	@param reason the reason the lion dies 
+	       (BACKGROUND, ABANDONED, INFANTICIDE, FIGHT, HUNTED, LANDGONE, DISEASE)
+*/
 void Population::Kill(Lion* lion, DeathReason reason) {
 
 	stringstream iss;
@@ -638,6 +698,7 @@ void Population::Kill(Lion* lion, DeathReason reason) {
 	if (lion->GetDiseaseState() == EXPOSED)
 		countEdeaths++;
 
+	// hunting
 	int mf,ph,ind;
 	if (lion->GetSex() == MALE) mf = 0;
 	else mf = 1;
@@ -656,8 +717,6 @@ void Population::Kill(Lion* lion, DeathReason reason) {
 	assert(ph<2);
 	assert(ind<50);
 	age_deaths[mf][ph][ind]++;
-
-
 
 	list<Lion*>::iterator iter,iter2;
 	list<Lion*> cubs;
@@ -710,6 +769,10 @@ void Population::Kill(Lion* lion, DeathReason reason) {
 	}
 }
 
+/**
+	Removes a lion group from the population
+	@param group the group to remove
+*/
 void Population::Remove(LionGroup* group) {
 	
 	list<Pride*>::iterator piter;
@@ -782,6 +845,9 @@ void Population::Remove(LionGroup* group) {
 	toDelete.push_back(group);
 }
 
+/**
+	Calculates the survival for every lion in the population.
+*/
 void Population::CalculateSurvival() {
 	list<Lion*>::iterator iter;
 	Lion* lion;
@@ -932,6 +998,9 @@ void Population::CalculateSurvival() {
 
 }
 
+/**
+	Calculates the survival of lions in the population based on disease
+*/
 void Population::CalculateDiseaseSurvival() {
 	list<Lion*>::iterator iter;
 	Lion* lion;
@@ -977,13 +1046,18 @@ void Population::CalculateDiseaseSurvival() {
 
 }
 
-
+/**
+	Updates the ages of all the lions in the population
+*/
 void Population::UpdateAges() {
 	list<Lion*>::iterator iter;
 	for (iter=lions.begin();iter!=lions.end();iter++)
 		(*iter)->SetAge((*iter)->GetAge() + TIMESTEP);
 }
 
+/**
+	Finds groups of subadult females throughout the population and removes them from their natal group
+*/
 void Population::KickOutOldGirls() {
 
 	list<Pride*>::iterator piter;
@@ -1017,6 +1091,9 @@ void Population::KickOutOldGirls() {
 	}
 }
 
+/**
+	Calculates the obtaining of vacant territories by homeless female groups for the whole population
+*/
 void Population::HomelessFemalesTakeTerritory() {
 	list<Pride*>::iterator piter;
 	list<Lion*> femgroup;
@@ -1050,7 +1127,9 @@ void Population::HomelessFemalesTakeTerritory() {
 
 }
 
-
+/**
+	Calculates the females that need to disperse as individuals for the whole population
+*/
 void Population::FemalesDisperseSeparately() {
 	list<Pride*>::iterator piter;
 	list<Lion*>::iterator liter;
@@ -1085,6 +1164,9 @@ void Population::FemalesDisperseSeparately() {
 	}
 }
 
+/**
+	Calculate females joining prides for the whole population
+*/
 void Population::FemalesJoinPride() {
 
 	list<Pride*>::iterator piter;
@@ -1176,6 +1258,9 @@ void Population::FemalesJoinPride() {
 	}
 }
 
+/**
+	Calculates what happens to a cohort of subadult females dispersing from their natal pride
+*/
 void Population::Disperse(list<Lion*> cohort) {
 
 	Pride* mompride = (Pride*)(cohort.front()->GetGroup());
@@ -1254,6 +1339,9 @@ void Population::Disperse(list<Lion*> cohort) {
 
 }
 
+/**
+	Calculate the forming of coalitions by subadult males for the whole population
+*/
 void Population::MalesFormCoalitions() {
 
 	stringstream iss;
@@ -1351,6 +1439,11 @@ void Population::MalesFormCoalitions() {
 	}
 }
 
+/**
+	Get the subadult coalition located on a territory
+	@param terr the territory that the subadults live on
+	@return the coalition
+*/
 Coalition* Population::GetSubAdultCoaltion(Territory* terr) {
 
 	Coalition* toret = NULL;
@@ -1369,7 +1462,9 @@ Coalition* Population::GetSubAdultCoaltion(Territory* terr) {
 	return toret;
 }
 
-
+/**
+	Promotes subadult coalitions to adult ones for the whole population
+*/
 void Population::PromoteAdultMales() {
 	list<Coalition*>::iterator iter;
 	stringstream iss;
@@ -1379,8 +1474,6 @@ void Population::PromoteAdultMales() {
 	list<Pride*>::iterator piter;
 
 	// promote when average age is >= 3
-	// OLD only promote if all subadults have reached age 3.0
-	// OLD (promote if oldest has reached age 3.0)
 	for (iter=coalitions.begin();iter!=coalitions.end();iter++) {
 		aveage = (*iter)->GetAverageAge();
 		if ((*iter)->GetStatus() == SUBADULT && aveage > param.MaleReproduceAge) {
@@ -1397,6 +1490,9 @@ void Population::PromoteAdultMales() {
 	}
 }
 
+/**
+	Calculate the moving and fighting of male coalitions for the whole population
+*/
 void Population::MalesMoveAndFight() {
 
 	list<Coalition*> coals;
@@ -1482,6 +1578,9 @@ void Population::MalesMoveAndFight() {
 	NomadsTeamUp();
 }
 
+/**
+	Calculate the teaming up of co-located nomadic males for the whole population
+*/
 void Population::NomadsTeamUp() {
 	list<Coalition*>::iterator iter,iter2;
 	list<Coalition*> nomads;
@@ -1529,6 +1628,11 @@ void Population::NomadsTeamUp() {
 	}
 }
 
+/**
+	Randomize the order of a list of coalitions
+	@param clist list of coalitions to randomly reorder
+	@return the reordered list of coalitions
+*/
 list<Coalition*> Population::RandomizeCoalitionList(list<Coalition*> clist) {
 
 	list<Coalition*> rlist;
@@ -1551,6 +1655,10 @@ list<Coalition*> Population::RandomizeCoalitionList(list<Coalition*> clist) {
 	return rlist;
 }
 
+/**
+	Moves a subadult coalition
+	@param coal the coalition to move
+*/
 void Population::SubadultMove(Coalition* coal) {
 	list<Lion*> leos = coal->GetLions();
 	list<Lion*>::iterator iter;
@@ -1558,7 +1666,6 @@ void Population::SubadultMove(Coalition* coal) {
 	Territory* origt = coal->GetLocation();
 
 	// if our youngest is 2.5 years old, we can take nearby unoccupied territory
-	// OLD (if we have any lions >=2.5 years old, we can take nearby unoccupied territory)
 	if ((coal->GetLionsUnderAge(param.MaleReproduceAge,MALE)).empty()) 
 		ProcureUnoccupiedTerritory(coal,param.SubadultMaleMoves);
 
@@ -1566,6 +1673,10 @@ void Population::SubadultMove(Coalition* coal) {
 		coal->AddToOrderedVisit(coal->GetLocation());
 }
 
+/**
+	Moves a nomadic coalition and engages in fighting if necessary
+	@param coal the coalition to move and fight
+*/
 void Population::NomadicMoveAndFight(Coalition* coal) {
 	list<Lion*> leos;
 	list<Lion*>::iterator liter;
@@ -1587,7 +1698,11 @@ void Population::NomadicMoveAndFight(Coalition* coal) {
 	coal->AddToOrderedVisit(coal->GetLocation());
 }
 
-// return false if unsuccessful
+/**
+	Try to move a coalition to a neighboring territory
+	@param coal the coalition to move
+	@return true if the move was successful, false if not
+*/
 bool Population::MoveToNeighboringTerritory(Coalition* coal) {
 	stringstream iss;
 	list<Territory*> nterr;
@@ -1632,6 +1747,11 @@ bool Population::MoveToNeighboringTerritory(Coalition* coal) {
 	return true;
 }
 
+/**
+	Coalition attacks a resident coalition for control of the given territory
+	@param coal the attacking coalition
+	@param terr the disputed territory
+*/
 void Population::AttackResidentCoalition(Coalition* coal,Territory* terr) {
 	stringstream iss;
 	
@@ -1672,15 +1792,20 @@ void Population::AttackResidentCoalition(Coalition* coal,Territory* terr) {
 		res->SetLocation(terr);
 		Fight(coal,res,coal);
 	}
-	
-
 }
 
+/**
+	Calculate the relative strength Q of the attacking and defending coalitions
+	baed on age of the lions
+	The formula using Q is q=number of attackers / (number of defenders * Q)
+	We average Q over all combinations of attacking and defending lions
+	(instead of picking an arbitrary oldest age of group or average of group age)
+	Half years (e.g. 3.5) are considered rounded down
+	@param att the attacking coalition
+	@param def the defending coalition
+	@return Q, the relative strength of the coalitions
+*/
 double Population::CalculateQ(Coalition* att,Coalition* def) {
-	// formula is q=number of attackers / (number of defenders * Q)
-	// we average Q over all combinations of attacking and defending lions
-	// (instead of picking an arbitrary oldest age of group or average of group age)
-	// half years (e.g. 3.5) are considered rounded down
 	list<Lion*> dlions = def->GetLions();
 	list<Lion*> alions = att->GetLions();
 	list<Lion*>::iterator diter, aiter;
@@ -1712,6 +1837,12 @@ double Population::CalculateQ(Coalition* att,Coalition* def) {
 	return (numatt / (numdef*b));
 }
 
+/**
+	Calculates the implications of a fight
+	@param att attacking coalition
+	@param def defending coalition
+	@param win the winning coalition
+*/
 void Population::Fight(Coalition* att,Coalition* def,Coalition* win) {
 
 	stringstream iss;
@@ -1765,6 +1896,11 @@ void Population::Fight(Coalition* att,Coalition* def,Coalition* win) {
 	
 }
 
+/**
+	Choose a random territory from a list of territories
+	@param terr a list of territories
+	@return a random territory from that list
+*/
 Territory* Population::ChooseRandomTerritory(list<Territory*> terr) {
 
 	int takeme,i;
@@ -1778,6 +1914,10 @@ Territory* Population::ChooseRandomTerritory(list<Territory*> terr) {
 	return *iter;
 }
 
+/**
+	Tries to expand the territory of a resident coalition
+	@param coal the coalition
+*/
 void Population::ResidentMoveAndFight(Coalition* coal) {
 	stringstream iss;
 	list<Territory*>::iterator iter,iter2;
@@ -1848,6 +1988,11 @@ void Population::ResidentMoveAndFight(Coalition* coal) {
 	}
 }
 
+/**
+	Procures an unoccupied territory for a coalition
+	@param coal the coalition
+	@param awayby how far away the coalition can search for territories
+*/
 void Population::ProcureUnoccupiedTerritory(Coalition* coal,int awayby) {
 
 	list<Territory*> terrs;
@@ -1883,6 +2028,11 @@ void Population::ProcureUnoccupiedTerritory(Coalition* coal,int awayby) {
 	}
 }
 
+/**
+	Procures an occupied territory for a coalition and calculates implications
+	@param coal the coalition taking over the territory
+	@param terr the territory being acquired
+*/
 void Population::TakeOverTerritory(Coalition* coal,Territory* terr) {
 
 	list<Lion*> cubs,temp;
@@ -1948,7 +2098,6 @@ void Population::TakeOverTerritory(Coalition* coal,Territory* terr) {
 	}
 	markedToDie.clear();
 
-
 	// commit infanticide
 	for (iter=cubs.begin();iter!=cubs.end();iter++) {
 		cub = *iter;
@@ -1990,6 +2139,11 @@ void Population::TakeOverTerritory(Coalition* coal,Territory* terr) {
 
 }
 
+/**
+	Hunts a single lion of the given sex
+	@param huntsex sex of the target lion (MALE, FEMALE)
+	@return whether or not the hunt was successful
+*/
 bool Population::HarvestSingleTrophy(Sex huntsex) {
 
 	bool success = false;
@@ -2024,7 +2178,9 @@ bool Population::HarvestSingleTrophy(Sex huntsex) {
 	return success;
 }
 
-
+/**
+	Hunts lions across the whole population based on simulation parameters
+*/
 void Population::HarvestTrophies() {
 
 	stringstream iss;
@@ -2119,6 +2275,11 @@ void Population::HarvestTrophies() {
 
 }
 
+/**
+	Gets a list of huntable lions by sex
+	@param huntsex sex of lions to hunt (MALE, FEMALE)
+	@return list of huntable lions
+*/
 list<Lion*> Population::GetHuntableLions(Sex huntsex) {
 	list<Lion*> toret;
 	if (huntsex == MALE)
@@ -2128,6 +2289,10 @@ list<Lion*> Population::GetHuntableLions(Sex huntsex) {
 	return toret;
 }
 
+/**
+	Gets a list of huntable female lions
+	@return list of huntable female lions
+*/
 list<Lion*> Population::GetHuntableFemales() {
 
 	list<Lion*> hlion;
@@ -2149,6 +2314,10 @@ list<Lion*> Population::GetHuntableFemales() {
 	return hlion;
 }
 
+/**
+	Gets a list of huntable male lions
+	@return list of huntable male lions
+*/
 list<Lion*> Population::GetHuntableMales() {
 	list<Lion*> hlion;
 	list<Lion*> clion;
@@ -2190,6 +2359,12 @@ list<Lion*> Population::GetHuntableMales() {
 	return hlion;
 }
 
+/**
+	Gets a list of all lions in the population between the given ages, inclusive
+	@param agemin minimum age
+	@param agemax maximum age
+	@return list of lions
+*/
 list<Lion*> Population::GetLions(double agemin,double agemax) {
 	list<Lion*>::iterator iter;
 	list<Lion*> toret;
@@ -2203,6 +2378,13 @@ list<Lion*> Population::GetLions(double agemin,double agemax) {
 	return toret;
 }
 
+/**
+	Gets a list of lions of a given sex and between the given ages, inclusive
+	@param sex sex (MALE, FEMALE)
+	@param agemin minimum age
+	@param agemax maximum age
+	@return list of lions
+*/
 list<Lion*> Population::GetLions(Sex sex,double agemin,double agemax) {
 
 	list<Lion*>::iterator iter;
@@ -2218,6 +2400,14 @@ list<Lion*> Population::GetLions(Sex sex,double agemin,double agemax) {
 	return toret;
 }
 
+/**
+	Gets a list of lions in given territories of a given sex and between the given ages, inclusive
+	@param ters list of territories to find lions
+	@param sex sex (MALE, FEMALE)
+	@param agemin minimum age
+	@param agemax maximum age
+	@return list of lions
+*/
 list<Lion*> Population::GetLions(list<Territory*> ters,Sex sex,double agemin,double agemax) {
 
 	list<Lion*>::iterator iter;
@@ -2232,6 +2422,13 @@ list<Lion*> Population::GetLions(list<Territory*> ters,Sex sex,double agemin,dou
 	return toret;
 }
 
+/**
+	Gets a list of lions in given territories between the given ages, inclusive
+	@param ters list of territories to find lions
+	@param agemin minimum age
+	@param agemax maximum age
+	@return list of lions
+*/
 list<Lion*> Population::GetLions(list<Territory*> ters,double agemin,double agemax) {
 
 	list<Lion*>::iterator iter;
@@ -2297,7 +2494,11 @@ list<Lion*> Population::GetLions(list<Territory*> ters,double agemin,double agem
 	return toret;
 }
 
-
+/**
+	Gets a list of territories by whether or not hunting is allowed on them
+	@param huntable whether or not hunting is allowed
+	@return list of territories
+*/
 list<Territory*> Population::GetTerritories(bool huntable) {
 	list<Territory*> ters;
 	list<Territory*>::iterator iter;
@@ -2308,10 +2509,16 @@ list<Territory*> Population::GetTerritories(bool huntable) {
 	return ters;
 }
 
+/**
+	Coalition loses a territory.
+*/
 void Population::CoalitionLosesTerritory(Coalition* coal) {
 }
 
-
+/**
+	Get the average size of prides across the population
+	@return the average pride size
+*/
 double Population::GetAveragePrideSize() {
 	list<Pride*> pris = GetAllPrides();
 	list<Pride*>::iterator iter;
@@ -2323,6 +2530,10 @@ double Population::GetAveragePrideSize() {
 	return (sum/double(pris.size()));
 }
 
+/**
+	Get the average size of coalitions across the population
+	@return the average coalition size
+*/
 double Population::GetAverageResidentCoalitionSize() {
 	list<Coalition*> coals = GetAllCoalitions();
 	list<Coalition*>::iterator iter;
@@ -2339,6 +2550,11 @@ double Population::GetAverageResidentCoalitionSize() {
 	return (sum/double(counter));
 }
 
+/**
+	Get a list of all coalitions of the given type
+	@param stat coaltion type (SUBADULT, NOMADIC, RESIDENT)
+	@return list of coalitions
+*/
 list<Coalition*> Population::GetCoalitions(MaleStatus stat) {
 	list<Coalition*> toret;
 	list<Coalition*>::iterator iter;
@@ -2350,7 +2566,9 @@ list<Coalition*> Population::GetCoalitions(MaleStatus stat) {
 	return toret;
 }
 
-
+/**
+	Record statistics for the transcript
+*/
 void Population::TranscriptStatistics() {
 
 	stringstream iss;
@@ -2611,7 +2829,9 @@ void Population::TranscriptStatistics() {
 	
 }
 
-
+/**
+	Calculate population statistics
+*/
 void Population::Statistics() {
 
 
@@ -2881,9 +3101,12 @@ void Population::Statistics() {
 			
 }
 
-
-
-
+/**
+	Return whether or not a single lion or a group of lions is a subset of another list of lions
+	@param sub a single lion or list of lions that may be a subset
+	@param big the larger list of lions that may contain the subset
+	@return whether or not sub is a subset of big
+*/
 bool Population::IsSubsetOfList(Lion* sub,list<Lion*> big) {
 	list<Lion*> leos;
 	leos.push_back(sub);
@@ -2915,7 +3138,9 @@ bool Population::IsSubsetOfList(list<Lion*> sub,list<Lion*> big) {
 	return toret;
 }
 
-
+/**
+	Calculate the implications of conservation land loss across the population
+*/
 void Population::LandLoss() {
 
 	// if we're past the threshhold, stop
@@ -2948,7 +3173,10 @@ void Population::LandLoss() {
 
 }
 
-
+/**
+	Return the list of territories on the edges of the landscape
+	@return list of edge territories
+*/
 list<Territory*> Population::GetEdgeTerritories() {
 
 	int nnum;
@@ -2972,6 +3200,9 @@ list<Territory*> Population::GetEdgeTerritories() {
 	return toReturn;
 }
 
+/**
+	Removes a random territory from the landscape
+*/
 void Population::DeleteRandomTerritory() {
 	int num = rand() % int(territories.size());
 	int i=0;
@@ -2988,6 +3219,9 @@ void Population::DeleteRandomTerritory() {
 	DeleteTerritory(id);
 }
 
+/**
+	Removes a random edge territory from the landscape
+*/
 void Population::DeleteEdgeTerritory() {
 
 	list<Territory*> edges = GetEdgeTerritories();
@@ -3007,6 +3241,10 @@ void Population::DeleteEdgeTerritory() {
 	DeleteTerritory(id);
 }
 
+/**
+	Remove a territory by ID number
+	@param id the ID number of the territory to remove
+*/
 void Population::DeleteTerritory(int id) {
 
 	// first remove the lions on this territory
@@ -3037,6 +3275,10 @@ void Population::DeleteTerritory(int id) {
 
 }
 
+/**
+	Remove the lions from the given territory
+	@param id the ID number of the territory
+*/
 void Population::DisplaceLionsInTerritory(int id) {
 
 	stringstream iss;
@@ -3187,8 +3429,9 @@ void Population::DisplaceLionsInTerritory(int id) {
 	}
 }
 
-
-
+/**
+	Identify the in-group and out-group groupings for the whole population
+*/
 void Population::IdentifyIngroupAndOutgroup() {
 
 	list<Lion*>::iterator iter;
@@ -3302,6 +3545,10 @@ void Population::IdentifyIngroupAndOutgroup() {
 	}
 }
 
+/**
+	Get all lion groups in the population
+	@return list of all lion groups
+*/
 list<LionGroup*> Population::GetAllGroups() {
 
 	list<LionGroup*> toRet;
@@ -3317,6 +3564,11 @@ list<LionGroup*> Population::GetAllGroups() {
 	return toRet;
 }
 
+/**
+	Deduplicate a list of lion groups
+	@param gps the list to dedupe
+	@return a deduped list of lion groups
+*/
 list<LionGroup*> Population::DedupeGroups(list<LionGroup*> gps) {
 	list<LionGroup*> toRet;
 	list<LionGroup*>::iterator iter,iter2;
@@ -3339,6 +3591,12 @@ list<LionGroup*> Population::DedupeGroups(list<LionGroup*> gps) {
 	return toRet;
 }
 
+/**
+	Removes a subset of lion groups from a larger list of lion groups
+	@param big the larger list to remove lion groups from
+	@param lit the smaller list of lion groups to remove from the larger list
+	@return the larger list minus the smaller list
+*/
 list<LionGroup*> Population::RemoveGroups(list<LionGroup*> big,list<LionGroup*> lit) {
 	list<LionGroup*> toRet;
 	list<LionGroup*>::iterator iter,iter2;
@@ -3360,6 +3618,9 @@ list<LionGroup*> Population::RemoveGroups(list<LionGroup*> big,list<LionGroup*> 
 	return toRet;
 }
 
+/**
+	Calculate disease for the whole population
+*/
 void Population::UpdateDisease() {
 
 	list<LionGroup*> exa;
@@ -3501,6 +3762,9 @@ void Population::UpdateDisease() {
 
 }
 
+/**
+	Update disease in buffalo across the whole landscape
+*/
 void Population::UpdateBuffaloDisease() {
 
 	list<Territory*>::iterator titer;
