@@ -1,3 +1,11 @@
+/**
+	Territory.cpp
+	A piece of land on which a lion group resides. Each territory is adjacent to some other 
+	territories and together all the territories form the landscape for the population.
+	
+	@author mkosmala
+*/
+
 #include "stdafx.h"
 #include "Territory.h"
 
@@ -5,6 +13,9 @@ using namespace SimSimba;
 
 Territory::~Territory() {}
 
+/**
+	Calculate which territories are neighbors of this territory 
+*/
 void Territory::CalculateNeighbors() {
 
 	// yourself is 0 away
@@ -43,7 +54,11 @@ void Territory::CalculateNeighbors() {
 	}
 }
 
-
+/**
+	Return whether this territory is in the list of passed territories
+	@param tlist list of territories to check
+	@return true if this territory is in the list, false otherwise
+*/
 bool Territory::IsInList(list<Territory*> tlist) {
 	bool inlist = false;
 	list<Territory*>::iterator iter;
@@ -57,6 +72,12 @@ bool Territory::IsInList(list<Territory*> tlist) {
 	return inlist;
 }
 
+/**
+	Find a territory without a lion group that is the specified number of
+	adjacencies away
+	@param ab number of adjacencies away (self=0, neighbors=1, etc.)
+	@return list of territories
+*/
 list<Territory*> Territory::GetEmptyTerritoryAwayBy(int ab) {
 
 	list<Territory*> nearby = GetTerritoryAwayBy(ab);
@@ -71,8 +92,10 @@ list<Territory*> Territory::GetEmptyTerritoryAwayBy(int ab) {
 	return empties;
 }
 
-
-
+/**
+	Separate this territory from its neighbor
+	@param id the ID of the neighboring territory to separate
+*/
 void Territory::RemoveNeighbor(int id) {
 
 	int i;
@@ -92,7 +115,11 @@ void Territory::RemoveNeighbor(int id) {
 	}
 }
 
-
+/**
+	Calculate the background disease prevalence on this territory 
+	(i.e. the rate of bovine tuberculosis in the buffalo on this territory)
+	@param tstep the timestep for which to calculate disease
+*/
 void Territory::CalculateDisease(double tstep) {
 
 	double diff;
