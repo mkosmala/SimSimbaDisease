@@ -11,6 +11,14 @@ namespace SimSimba {
 
 	class Lion {
 	public:
+		
+		/**
+		Constructor
+		@param i lion ID number
+		@param s lion sex (MALE, FEMALE)
+		@param m this lion's mom
+		@param par pointer to simulation parameters
+		*/
 		Lion(int i, Sex s, Lion* m,Param par) {
 			age = 0;
 			ageOfExposed = -1;
@@ -23,6 +31,7 @@ namespace SimSimba {
 		}
 		~Lion();
 
+		/* Getters and Setters */
 		int GetIDNumber() { return idnum; }
 		double GetAge() { return age; }
 		Sex GetSex() { return sex; }
