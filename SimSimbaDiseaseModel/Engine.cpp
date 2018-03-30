@@ -1,3 +1,9 @@
+/**
+	Engine.cpp
+	Runs one or more lion population simulations.
+	
+	@author mkosmala
+*/
 #include "stdafx.h"
 #include "Engine.h"
 #include "Parser.h"
@@ -7,8 +13,12 @@ using namespace SimSimba;
 
 Engine::~Engine() {}
 
+/**
+	Reads in the parameters file and runs one or more simulations. 
+*/
 void Engine::Run() {
 
+	// parse the parameters file
 	Parser* parser = new Parser();
 
 	string pn = "Parameters.txt"; // default
@@ -16,6 +26,7 @@ void Engine::Run() {
 		pn = paramname;			  // passed in
 	param = parser->Parse(pn);
 
+	// set up files for recording statistics
 	bool dostats = true;
 	if (statsname=="")
 		dostats = false;
@@ -41,6 +52,9 @@ void Engine::Run() {
 	}
 }
 
+/**
+	Runs a single simulation of a lion population.
+*/
 void Engine::OneSimulation() {
 
 	bool dostats = true;
