@@ -12,6 +12,14 @@ namespace SimSimba {
 
 	class Territory {
 	public:
+		/**
+			Constructor
+			@param i ID number of this territory
+			@param h whether hunting is allowed on this territory
+			@param ldb the rate at which lions eat buffalo on this territory
+			@param db the prevalence of disease in buffalo on this territory
+			@param ssfdb the starting time step of disease in buffalo on this territory
+		*/
 		Territory(int i,bool h,double ldb,double db,double ssfdb) {
 			idnum = i;
 			huntable = h;
