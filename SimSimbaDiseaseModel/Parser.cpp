@@ -5,6 +5,11 @@ using namespace SimSimba;
 
 Parser::~Parser() {}
 
+/**
+	Parses the parameters file and saves the values in a Param object
+	@param fname name of the parameters file
+	@return Param object containing the parameters needed for simulation
+*/
 Param Parser::Parse(string fname) {
 
 	fstream fs;
@@ -68,7 +73,11 @@ Param Parser::Parse(string fname) {
 	return param;
 }
 
-
+/**
+	Sets one of the parameters for the simulation
+	@param token the parameter to be set
+	@param value value to which the parameter should be set
+*/
 void Parser::SetGlobalVariable(string token, string value) {
 
 	if (token=="SimType") {
@@ -501,6 +510,10 @@ void Parser::SetGlobalVariable(string token, string value) {
 
 }
 
+/**
+	Parses the two-dimensional table of fighting odds
+	@param fightnums list of rows in the fight table
+*/
 void Parser::ParseFightTable(list<string> fightnums) {
 
 	list<string>::iterator iter;
@@ -521,13 +534,20 @@ void Parser::ParseFightTable(list<string> fightnums) {
 
 }
 
+/**
+	Quits if there's an error reading the parameters file
+	@param par parameter name
+	@param val value given to parameter name
+*/
 void Parser::Error(string par, string val) {
 
 	cout <<  "Syntax error in Parameters file: " << par << " = " << val << endl;
 	exit(1);
 }
 
-// automatic and default variables
+/**
+	Set parameters to automatic and default values
+*/
 void Parser::Prefill() {
 
 	int i,k;
@@ -544,6 +564,9 @@ void Parser::Prefill() {
 
 }
 
+/**
+	Calculate the life expectancy for males and females and save as parameter values.
+*/
 void Parser::CalculateLifeExpectancy() {
 	
 	int i,j;
