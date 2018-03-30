@@ -1,3 +1,9 @@
+/**
+	Lion.cpp
+	A lion
+	
+	@author mkosmala
+*/
 #include "stdafx.h"
 #include "Lion.h"
 #include "Coalition.h"
@@ -6,6 +12,10 @@ using namespace SimSimba;
 
 Lion::~Lion() {}
 
+/**
+	Detach offspring from this lion, either because it died or we died
+	@param cub offspring to remove
+*/
 void Lion::RemoveOffspring(Lion* cub) {
 	list<Lion*>::iterator iter;
 	for (iter=offspring.begin();iter!=offspring.end();) {
@@ -18,6 +28,12 @@ void Lion::RemoveOffspring(Lion* cub) {
 	}
 }
 
+/**
+	Get the demographic group to which this lion belongs (cubs of 4 ages or subadult or adult,
+	male or female, and if male, whether resident or nomadic)
+	@return lion demographic group (CUB0,CUB1,CUB2,CUB3,SUBADULT_F,ADULT_F,SUBADULT_M,
+	ADULT_M_NOMADIC, ADULT_M_RESIDENT)
+*/
 int Lion::GetDemographicGroup() {
 	int ret;
 
@@ -64,7 +80,10 @@ int Lion::GetDemographicGroup() {
 	return ret;
 }
 
-
+/** 
+	Set the disease state for this lion
+	@param ds disease state (SUSCEPTIBLE, EXPOSED, INFECTIOUS)
+*/
 void Lion::SetDiseaseState(DiseaseState ds) {
 
 	// set state
@@ -80,8 +99,21 @@ void Lion::SetDiseaseState(DiseaseState ds) {
 	}
 }
 
-
+/**
+	Get the number of infectious lions in the same group as this lion.
+	@return number of infections lions in this lion's group
+*/
 int Lion::GetInfectiousIns() { return group->GetInfectiousIns(); }
+
+/**
+	Get the number of infectious lions in groups affiliated with this lion's group
+	@return number of infections lions in the groups affiliated with this lion's group
+*/
 int Lion::GetInfectiousOuts() { return group->GetInfectiousOuts(); }
+
+/**
+	Get the average prevelence of disease in buffalos in this lion's territory/ies
+	@return the average prevelence of disease in buffalos in this lion's territory/ies
+*/
 double Lion::GetAveDiseasedDietBuffalo() { return group->GetAveDiseasedDietBuffalo(); }
 
