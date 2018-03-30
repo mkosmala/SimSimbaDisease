@@ -1,20 +1,27 @@
-// SimSimbaDisease.cpp : Defines the entry point for the console application.
-//
+/** 
+	SimSimbaDisease.cpp
+	Defines the entry point for the console application. 
+	
+	@author mkosmala
+*/
 
 #include "stdafx.h"
 #include "Engine.h"
 
 using namespace SimSimba;
 
-// syntax: simsimba2007 inpop timesteps [-pparam] [-ooutpop] [-sstats] [-rreplicates] [-t]
-// inpop = input population file
-// param = parameters file; if not specified = "Parameters.txt"
-// outpop = output population file
-// stats = statistics file
-// timesteps = number of timesteps
-// replicates = number of replicates (default 1)
-// -t = write to transcript file
+/**
+	Parses the input arguments and starts the Engine.
 
+	syntax: simsimba2007 inpop timesteps [-pparam] [-ooutpop] [-sstats] [-rreplicates] [-t]
+	inpop = input population file
+	param = parameters file; if not specified = "Parameters.txt"
+	outpop = output population file
+	stats = statistics file
+	timesteps = number of timesteps
+	replicates = number of replicates (default 1)
+	-t = write to transcript file
+*/
 int main(int argc, char* argv[])
 {
 
