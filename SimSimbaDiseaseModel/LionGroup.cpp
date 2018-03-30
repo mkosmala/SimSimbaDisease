@@ -1,3 +1,10 @@
+/**
+	LionGroup.cpp
+	Defines a group of lions, either a pride (females and cubs) or coalition (males)
+	
+	@author mkosmala
+*/
+
 #include "stdafx.h"
 #include "LionGroup.h"
 
@@ -5,6 +12,7 @@ using namespace SimSimba;
 
 LionGroup::~LionGroup() {}
 
+/* Getters for getting lions of various ages from this group */
 list<Lion*> LionGroup::GetLionsAtAge(double age,Sex sex) {
 	return GetLionsBetweenAges(age,age,sex);
 }
@@ -41,6 +49,10 @@ list<Lion*> LionGroup::GetCubs() {
 	return cohort;
 }
 
+/**
+	Returns whether this group is in the passed list of LionGroups
+	@return whether this group is in the passed list of LionGroups (true/false)
+*/
 bool LionGroup::IsInList(list<LionGroup*> tlist) {
 	bool inlist = false;
 	list<LionGroup*>::iterator iter;
@@ -54,6 +66,12 @@ bool LionGroup::IsInList(list<LionGroup*> tlist) {
 	return inlist;
 }
 
+/**
+	Calculates the infectious contacts for this lion group. In particular, 
+	caulculates the number of infectious lions within the group,
+	the number of infectious lions in affiliated groups, and the prevelence
+	of disease in the buffalo in the territories this group uses.
+*/
 void LionGroup::CalculateInfectiousContacts() {
 
 	list<Lion*> allins;
