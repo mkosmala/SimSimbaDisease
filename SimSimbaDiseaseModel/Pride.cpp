@@ -1,3 +1,10 @@
+/**
+	Pride.cpp
+	A pride of lions, which includes adult and subadult females and cubs
+	
+	@author mkosmala
+*/
+
 #include "stdafx.h"
 #include "Pride.h"
 
