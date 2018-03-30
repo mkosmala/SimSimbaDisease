@@ -1,0 +1,313 @@
+SimSimba2007 Parameters
+
+// THESE PARAMETERS ARE SET FOR SIMSIMBA DISEASE 
+
+// used for scripting to keep track of parameter sets
+Scenario = 1
+
+
+// Simulation type
+// SOLO - run the simulation using leopard behaviors
+// GROUP - run the simulation using lion behaviors
+
+SimType = GROUP
+
+
+// -------------------------------------------
+// Population Parameters 
+// -------------------------------------------
+
+MaxAge = 16
+
+// max females per group
+// for lion set to =~ 6, for leopard set to = 1
+FemaleMax = 5
+
+// max males per group
+// for lion set to =~ 10, for leopard set to = 1
+MaleMax = 10
+
+
+// -------------------------------------------
+// Age Categories
+// -------------------------------------------
+
+// can have up to 4 cub age categories
+// Cub1Age is implied to begin at age 0
+// for lions set = 0.5, 1
+// for leopards set = 0.5
+Cub2Age = 0.5
+Cub3Age = 1.0
+
+// for lions set = 2.0 for both
+// for leopards set = 1.5 for both
+SubadultMaleAge = 2.0
+SubadultFemaleAge = 2.0
+
+// for lions set = 2.5, male, 3.0 female
+// for leopards set = 2.5 male, 3.0 female
+MaleReproduceAge = 3.5
+FemaleReproduceAge = 3.5
+
+// subadult males stay with mom until reach reproductive age. then they
+// can look X spots away to find something open. if no open, stay w/
+// mom. Once turn adult, they can wander off
+// subadult females start looking for own territories immediately 
+// upon becoming subadult. If not, they can stay with mom until
+// become reproductive. then they must disperse or become "wandering"
+
+// for lions set = 4.0 for both
+// for leopards set = 3.5 for both
+AdultMaleAge = 5.0
+AdultFemaleAge = 5.0
+
+
+
+// -------------------------------------------
+// Background Survivorship Parameters
+// -------------------------------------------
+
+SurviveCub1 = 0.707
+SurviveCub2 = 0.775
+SurviveCub3 = 0.906
+SurviveSubadultMale = 0.877
+SurviveSubadultFemale = 0.964
+SurviveResidentMale = 0.949
+SurviveNomadicMale = 0.949
+SurviveAdultFemale = 0.929
+
+SurviveEvictedMale = 0.949
+
+// ignored for leopards
+SurviveOrphan = 0.500
+
+// set to 0 to immediately kill off females who can't find a territory
+SurviveHomelessFemale = 0.5
+
+
+
+// -------------------------------------------
+// Fighting Survivorship Parameters
+// -------------------------------------------
+
+// Fighting Infanticide Survivorship 
+SurviveTakeoverCub1 = 0.01
+SurviveTakeoverCub2 = 0.25
+SurviveTakeoverCub3 = 0.65
+
+// Defending Female survivorship
+SurviveDefendingFemale = 0.9
+
+// Fighting Male survivorship
+SurviveDefendingMaleWins = 0.97
+SurviveDefendingMaleLoses = 0.40
+SurviveAttackingMaleLoses = 0.50
+SurviveAttackingMaleWins = 0.97
+
+
+
+// -------------------------------------------
+// Reproduction Parameters
+// -------------------------------------------
+
+// East Africa: 1=0.19, 2=0.35, 3=.33, 4=0.13
+
+LitterSize1 = 0.05
+LitterSize2 = 0.05
+LitterSize3 = 0.75
+LitterSize4 = 0.15
+CubMale = 0.5
+
+// ignored for leopards
+CubAbandoned = 0.7
+
+
+
+// -------------------------------------------
+// Territory Parameters
+// -------------------------------------------
+
+// for lions set = 3, for leopards = 5
+NomadMoves = 3
+
+// Number of territories away subadults can look away from mom's territory
+// for lions set = 1, for leopards = 2
+SubadultMaleMoves = 1;
+
+
+// Territories
+
+// format = ResidentTakes [#] [ONLY/ORMORE] males take [#] territories
+//          with a chance of [%], when they already have one fewer.
+//          So for example, to say that a group of 3 males (only) can
+//          take a second territory when they already have one with
+//          a 33% chance, write:
+//          
+//          ResidentTakes 3 ONLY 2 0.33
+// 
+
+// lions
+ResidentTakes = 2 ONLY 2 0.0001
+ResidentTakes = 3 ORMORE 2 0.33
+ResidentTakes = 3 ORMORE 3 0.01
+
+//ResidentTakes = 4 ORMORE 2 0.75
+//ResidentTakes = 4 ORMORE 3 0.33
+
+// Nomad Coalitions
+NomadJoins1Resident = 0.50
+NomadJoins1Nomad = 1.00
+NomadJoins2Nomads = 0.20
+
+// Dispersal of Subadult Females
+FemaleMoves2 = 0.80
+FemaleMoves3 = 0.30
+FemaleMoves4 = 0.15
+FemaleMoves5 = 0.10
+
+
+// -------------------------------------------
+// Hunting Parameters
+// -------------------------------------------
+
+// hunting = ANNUAL or BIANNUAL. The quota is per this specification
+TrophyHunt = BIANNUAL
+TrophyQuota = 0
+TrophyMinAge = 20
+
+// error rate in sexing trophy
+// set to = 0.286 for leopards, 0 for lions
+TrophySexError = 0.0
+
+SwitchStrategy = -1
+
+
+// -------------------------------------------
+// Land Loss Parameters
+// -------------------------------------------
+
+// lose this fraction of original number of territories
+LandLossFraction = 0.0
+
+// loss over this period of time (in years)
+LandLossTime = 10
+
+// method of land loss. Options are EDGES or RANDOM
+LandLossType = RANDOM
+
+
+// -------------------------------------------
+// Disease Parameters 
+// -------------------------------------------
+
+
+// initial years with no disease
+NoDiseaseYears = 25
+
+// chance per timestep of transitioning from E to I
+// (To get mean time in E in years, invert and divide by 2)
+EtoIRate = 0.4
+
+// chance per timestep of transitioning from I to dead
+// (To get mean time in I in years, invert and divide by 2)
+ItoDeadRate = 0.8
+
+// disease fecundity factor - fraction of infectious reproductive females that
+// give birth (at all) in a given timestep
+DiseaseFucundity = 1
+
+// Transmission rate from mom to cub in first year
+MaternalTransmission = 0
+
+// Transmission rate between lions
+LionTransmission = 0.028485107421875
+
+// Probability of enountering a nearby non-pride lion
+OutgroupEncounter = 0.4776611328125
+
+// Transmission rate from buffalo, assuming buffalo is infectious
+FoodTransmission = 0.21099853515625
+
+// Food/buffalo disease progression type. CONSTANT means that the rates
+//   set in the .simba file will be used for the whole simulation.
+//   LOGISTIC means that the number in the .simba file will represent the
+//   time step in which disease starts in that territory, and it will
+//   increase logistically according to this formula:
+//   P(t) = 0.67 / (1 + e^-t) 
+
+FoodDiseaseProgression = LOGISTIC
+
+
+
+// -------------------------------------------
+// Fighting Parameters
+// -------------------------------------------
+
+// Fight Matrix - attackers are along x-axis, defenders along y-axis
+// age starts with 1 and goes to 10
+Fight Matrix
+1.40 1.40 1.40 1.90 0.65 0.70 0.75 0.70 1.00 1.00
+1.40 1.40 1.40 1.90 0.65 0.70 0.75 0.70 1.00 1.00
+1.40 1.40 1.40 0.90 0.65 0.70 0.75 0.70 1.00 1.00
+1.65 1.65 1.65 1.40 1.00 0.85 0.75 0.70 1.00 1.00
+2.20 2.20 2.20 1.65 1.50 1.00 0.90 1.00 1.00 1.00
+2.20 2.20 2.20 2.20 2.00 1.40 1.50 1.80 1.00 1.00
+2.50 2.50 2.50 2.20 2.00 1.40 1.50 1.80 1.00 1.00
+1.65 1.65 1.65 1.40 1.30 1.20 1.25 1.40 1.00 1.00
+1.30 1.30 1.30 1.30 1.25 1.00 1.05 1.35 1.00 1.00
+1.00 1.00 1.00 1.00 1.90 1.40 1.40 1.00 1.00 1.00
+
+
+
+// -------------------------------------------
+// Output statistics
+// -------------------------------------------
+//
+// statistics types:
+//
+// SURVIVE - surviving lions at end of step
+// HUNTED - number of lions hunted during step
+// RESCOALSIZE - average number of males per resident coalition
+// PRIDESIZE - average number of females per pride
+// DEATHAGE - the age of death of specified lions
+// DEMOGRAPHICS
+// DISEASE [age+] - format is "S,E,I" for each step
+// FOODINFECT
+//
+// If StatsType is SURVIVE, also include the following 
+//    restrictions: 
+//
+// M = male
+// F = female
+//
+// MIN X = with minimum age of X
+// BTW X Y = between ages X and Y (inclusive)
+//
+// H = only in huntable territories
+// P = only in non-huntable territories
+//
+// So, for example, if you want your statistics to show number 
+// of adult females age 4 and up you would write:
+//
+// StatsType = SURVIVE F MIN 4.0
+//
+// Or, if you wanted males between the ages of 2.5 and 5 in 
+// huntable territories, you'd write:
+//
+// StatsType = SURVIVE M BTW 2.5 5.0 H
+//
+// Or if you wanted all lions in non-huntable territories, 
+// you'd write:
+//
+// StatsType = SURVIVE P
+//
+// If StatsType is DEATHAGE, do only 1 replicate, as each line
+// is one time step and each column is a half-year of age.
+// You can use the male/female and huntable/non-huntable restrictions
+// with DEATHAGE. For example for males in the non-hunted area:
+//
+// StatsType = DEATHAGE M P 
+
+StatsType = DISEASE
+
+
