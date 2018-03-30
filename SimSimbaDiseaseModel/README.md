@@ -1,4 +1,4 @@
-﻿SimSimba-Disease
+﻿# SimSimba-Disease
 
 SimSimba is an agent-based simulation model that mimics the dynamics of a population of lions. It has been used for lion population research, as well as for conservation and lion trophy hunting management. The base model has been modified to include an SEI disease component to mimic the spread of bovine tuberculosis in the population of lions in Kruger National Park (KNP), South Africa. It is flexible enough to be used to model the spread of any disease transmitted from the environment to lions and/or from lion to lion. The demographic and disease parameters are defined in the parameters file (Parameters.txt). The values in the included Parameters.txt file are based on research from Serengeti lions and supplemented and replaced with demographic information from KNP when possible. The model also uses a second “simba” population file to define the landscape of lion territories, their adjacencies, and an initial population of lions. The included simba population file mimics the layout of Kruger National Park with a population of lions at carrying capacity and no disease. 
 
