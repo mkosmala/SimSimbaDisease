@@ -1,6 +1,8 @@
 /**
 	Parser.cpp
 	Parses the parameters file and saves the values to a Param object.
+	
+	@author mkosmala
 */
 
 #include "stdafx.h"
